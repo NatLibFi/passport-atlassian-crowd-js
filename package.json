@@ -1,0 +1,96 @@
+{
+	"name": "@natlibfi/passport-atlassian-crowd",
+	"description": "Passport strategy for Atlassian Crowd",
+	"author": {
+		"name": "The National Library of Finland"
+	},
+	"keywords": [],
+	"homepage": "https://github.com/natlibfi/passport-atlassian-crowd-js",
+	"bugs": {
+		"url": "https://github.com/natlibfi/passport-atlassian-crowd-js/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:natlibfi/passport-atlassian-crowd-js.git"
+	},
+	"license": "MIT",
+	"version": "1.0.0",
+	"main": "./dist/index.js",
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"prepublishOnly": "npm run build:transpile",
+		"check-deps": "npm-check;exit 0",
+		"lint": "eslint --fix src",
+		"test:base": "cross-env NODE_ENV=test mocha --require @babel/register",
+		"test": "npm run lint && npm run test:base -- src/*.spec.js src/**/*.spec.js src/**/**/*.spec.js",
+		"build:transpile": "babel src --source-maps --delete-dir-on-start --out-dir=dist",
+		"build": "npm run build:transpile && npm run check-deps",
+		"watch": "cross-env NODE_ENV=test chokidar src -c 'npm test'"
+	},
+	"dependencies": {
+		"@babel/register": "^7.0.0",
+		"debug": "^4.1.1",
+		"http-status": "^1.3.1",
+		"node-fetch": "^2.3.0",
+		"passport-strategy": "^1.0.0"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.2.0",
+		"@babel/core": "^7.2.0",
+		"@babel/preset-env": "^7.2.0",
+		"babel-eslint": "^10.0.1",
+		"babel-plugin-rewire": "^1.2.0",
+		"chai": "^4.2.0",
+		"chai-passport-strategy": "^1.0.1",
+		"chokidar-cli": "^1.2.0",
+		"cross-env": "^5.1.1",
+		"eslint": "^5.9.0",
+		"eslint-config-xo": ">=0.25.1 <1.0.0",
+		"eslint-plugin-import": "^2.16.0",
+		"mocha": "^6.0.2",
+		"nock": "^10.0.6",
+		"npm-check": "^5.9.0"
+	},
+	"eslintConfig": {
+		"parser": "babel-eslint",
+		"plugins": [
+			"import"
+		],
+		"extends": [
+			"xo",
+			"plugin:import/errors"
+		],
+		"rules": {
+			"prefer-arrow-callback": [
+				"error"
+			]
+		},
+		"env": {
+			"mocha": true
+		}
+	},
+	"babel": {
+		"presets": [
+			[
+				"@babel/preset-env",
+				{
+					"targets": {
+						"node": "8"
+					}
+				}
+			]
+		],
+		"env": {
+			"test": {
+				"plugins": [
+					"rewire"
+				]
+			}
+		}
+	}
+}

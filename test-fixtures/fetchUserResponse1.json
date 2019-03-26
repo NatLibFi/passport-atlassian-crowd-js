@@ -1,0 +1,29 @@
+{
+    "expand": "attributes",
+    "name": "foobar",
+    "first-name": "Foo",
+    "last-name": "Bar",
+    "display-name": "foobar",
+    "email": "foo@bar",
+    "created-date": 1549025872000,
+    "updated-date": 1549025872000,
+    "link": {
+        "href": "https://crowd/usermanagement/1/user?username=foobar",
+        "rel": "self"
+    },
+    "password": {
+        "link": {
+            "href": "https://crowd/usermanagement/1/user/password?username=foobar",
+            "rel": "edit"
+        }
+    },
+    "key": "16252929:af7c631c-6c9d-470d-999b-e401ce4a7959",
+    "active": true,
+    "attributes": {
+        "attributes": [],
+        "link": {
+            "href": "https://crowd/usermanagement/1/user/attribute?username=foobar",
+            "rel": "self"
+        }
+    }
+}

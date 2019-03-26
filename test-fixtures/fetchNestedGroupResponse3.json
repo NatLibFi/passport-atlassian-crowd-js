@@ -1,0 +1,12 @@
+{
+    "expand": "group",
+    "groups": [
+        {
+            "name": "bar",
+            "link": {
+                "href": "https://crowd/usermanagement/1/group?groupname=bar",
+                "rel": "self"
+            }
+        }
+    ]
+}
