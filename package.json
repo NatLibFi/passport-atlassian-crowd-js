@@ -14,7 +14,7 @@
 		"url": "git@github.com:natlibfi/passport-atlassian-crowd-js.git"
 	},
 	"license": "MIT",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"main": "./dist/index.js",
 	"publishConfig": {
 		"access": "public"
@@ -23,19 +23,20 @@
 		"node": ">=8"
 	},
 	"scripts": {
-		"prepublishOnly": "npm run build:transpile",
+		"prepublishOnly": "npm run build",
 		"check-deps": "npm-check;exit 0",
 		"lint": "eslint --fix src",
-		"test:base": "cross-env NODE_ENV=test mocha --require @babel/register",
-		"test": "npm run lint && npm run test:base -- src/*.spec.js src/**/*.spec.js src/**/**/*.spec.js",
-		"build:transpile": "babel src --source-maps --delete-dir-on-start --out-dir=dist",
-		"build": "npm run build:transpile && npm run check-deps",
+		"test:base": "cross-env NODE_ENV=test nyc mocha --require @babel/register",
+		"test": "npm run lint && npm run test:base -- src/**/*.spec.js && npm run coverage",
+		"coverage": "nyc check-coverage --per-file",
+		"build": "babel src --source-maps --delete-dir-on-start --out-dir=dist",
+		"build:dev": "npm run build && npm run check-deps",
 		"watch": "cross-env NODE_ENV=test chokidar src -c 'npm test'"
 	},
 	"dependencies": {
 		"@babel/register": "^7.0.0",
-		"debug": "^4.1.1",
 		"http-status": "^1.3.1",
+		"moment": "^2.24.0",
 		"node-fetch": "^2.3.0",
 		"passport-strategy": "^1.0.0"
 	},
@@ -43,8 +44,10 @@
 		"@babel/cli": "^7.2.0",
 		"@babel/core": "^7.2.0",
 		"@babel/preset-env": "^7.2.0",
+		"@natlibfi/fixura": "^1.0.0",
 		"babel-eslint": "^10.0.1",
 		"babel-plugin-rewire": "^1.2.0",
+		"babel-plugin-istanbul": "^5.1.0",
 		"chai": "^4.2.0",
 		"chai-passport-strategy": "^1.0.1",
 		"chokidar-cli": "^1.2.0",
@@ -54,7 +57,8 @@
 		"eslint-plugin-import": "^2.16.0",
 		"mocha": "^6.0.2",
 		"nock": "^10.0.6",
-		"npm-check": "^5.9.0"
+		"npm-check": "^5.9.0",
+		"nyc": "^13.1.0"
 	},
 	"eslintConfig": {
 		"parser": "babel-eslint",
@@ -88,9 +92,28 @@
 		"env": {
 			"test": {
 				"plugins": [
-					"rewire"
+					"rewire",
+					"istanbul"
 				]
 			}
 		}
+	},
+	"nyc": {
+		"exclude": [
+			"**/*.spec.js"
+		],
+		"reporter": [
+			"lcov",
+			"html"
+		],
+		"require": [
+			"@babel/register"
+		],
+		"sourceMap": false,
+		"instrument": false,
+		"lines": 80,
+		"statements": 80,
+		"functions": 80,
+		"branches": 80
 	}
 }

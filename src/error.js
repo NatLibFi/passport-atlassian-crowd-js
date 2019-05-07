@@ -15,4 +15,4 @@
 *
 */
 
-export * from './strategies';
+export default class extends Error {}

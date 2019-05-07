@@ -6,7 +6,7 @@ steps:
   commands:
   - npm install
   - npm test
-  - npm run build:transpile
+  - npm run build
 - name: npm
   image: plugins/npm
   settings:

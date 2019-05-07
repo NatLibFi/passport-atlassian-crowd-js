@@ -15,4 +15,6 @@
 *
 */
 
-export * from './strategies';
+export {default as BearerCredentialsStrategy} from './bearer-credentials';
+export {default as BearerTokenStrategy} from './bearer-token';
+export {default as BasicStrategy} from './basic';

@@ -15,4 +15,17 @@
 *
 */
 
-export * from './strategies';
+export function getCredentials(req) {
+	if (req.headers.authorization) {
+		const encoded = req.headers.authorization.replace(/^Basic /, '');
+		const [username, password] = Buffer.from(encoded, 'base64').toString().split(/:/);
+		return {username, password};
+	}
+
+	return {};
+}
+
+export function getRemoteAddress(req) {
+	/* istanbul ignore next: chai-passport request doesn't provide socket */
+	return req.socket ? req.socket.remoteAddress : undefined;
+}
