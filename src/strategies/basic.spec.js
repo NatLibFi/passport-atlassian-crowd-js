@@ -15,32 +15,33 @@
 *
 */
 
-import path from 'path';
-import fs from 'fs';
 import chai, {expect} from 'chai';
 import chaiPassportStrategy from 'chai-passport-strategy';
 import nock from 'nock';
-import AtlassianCrowdStrategy from './index';
+import fixturesFactory, {READERS} from '@natlibfi/fixura';
+import Strategy from './basic';
 
 chai.use(chaiPassportStrategy);
 
-const FIXTURES_PATH = path.join(__dirname, '..', 'test-fixtures');
+describe('strategies/basic', () => {
+	const {getFixture} = fixturesFactory({
+		root: [__dirname, '..', '..', 'test-fixtures', 'strategies', 'basic']
+	});
 
-describe('index', () => {
 	afterEach(() => {
 		nock.cleanAll();
 	});
 
 	it('Should call fail() because of missing credentials and token', async () => {
 		nock('https://crowd/usermanagement/1/session')
-			.post(/.*/).reply(401);
+			.post(/.*/).reply(400);
 
-		const Strategy = new AtlassianCrowdStrategy({
-			url: 'https://crowd', app: 'foo', password: 'bar'
+		const strategy = new Strategy({
+			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
 		});
 
 		return new Promise((resolve, reject) => {
-			chai.passport.use(Strategy)
+			chai.passport.use(strategy)
 				.success(() => reject(new Error('Should not call success()')))
 				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
 				.fail(resolve)
@@ -48,22 +49,22 @@ describe('index', () => {
 		});
 	});
 
-	it('Should succeed because of a valid token', () => {
-		const validateSessionResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'validateSessionResponse1.json'));
-		const fetchUserResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'fetchUserResponse1.json'));
-		const userData = JSON.parse(fs.readFileSync(path.join(FIXTURES_PATH, 'userData1.json')));
+	it('Should succeed because of a valid token', (index = '0') => {
+		const validateSessionResponse = getFixture([index, 'validateSessionResponse.json']);
+		const fetchUserResponse = getFixture([index, 'fetchUserResponse.json']);
+		const userData = getFixture({components: [index, 'userData.json'], reader: READERS.JSON});
 
 		nock('https://crowd')
 			.post('/usermanagement/1/session/bar').reply(200, validateSessionResponse)
 			.get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
 
-		const Strategy = new AtlassianCrowdStrategy({
-			url: 'https://crowd', app: 'foo', password: 'bar',
+		const strategy = new Strategy({
+			url: 'https://crowd', appName: 'foo', appPassword: 'bar',
 			ssoCookie: 'foo'
 		});
 
 		return new Promise((resolve, reject) => {
-			chai.passport.use(Strategy)
+			chai.passport.use(strategy)
 				.fail(() => reject(new Error('Should not call fail()')))
 				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
 				.success(user => {
@@ -81,22 +82,22 @@ describe('index', () => {
 		});
 	});
 
-	it('Should succeed because of valid credentials', () => {
-		const createSessionResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'createSessionResponse2.json'));
-		const fetchUserResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'fetchUserResponse2.json'));
-		const userData = JSON.parse(fs.readFileSync(path.join(FIXTURES_PATH, 'userData2.json')));
+	it('Should succeed because of valid credentials', (index = '1') => {
+		const createSessionResponse = getFixture([index, 'createSessionResponse.json']);
+		const fetchUserResponse = getFixture([index, 'fetchUserResponse.json']);
+		const userData = getFixture({components: [index, 'userData.json'], reader: READERS.JSON});
 
 		nock('https://crowd')
 			.post('/usermanagement/1/session').reply(201, createSessionResponse)
 			.get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
 
-		const Strategy = new AtlassianCrowdStrategy({
-			url: 'https://crowd', app: 'foo', password: 'bar',
+		const strategy = new Strategy({
+			url: 'https://crowd', appName: 'foo', appPassword: 'bar',
 			ssoCookie: 'foo'
 		});
 
 		return new Promise((resolve, reject) => {
-			chai.passport.use(Strategy)
+			chai.passport.use(strategy)
 				.fail(() => reject(new Error('Should not call fail()')))
 				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
 				.success(user => {
@@ -114,12 +115,12 @@ describe('index', () => {
 		});
 	});
 
-	it('Should fetch group membership information', () => {
-		const createSessionResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'createSessionResponse3.json'));
-		const fetchUserResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'fetchUserResponse3.json'));
-		const fetchDirectGroupResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'fetchDirectGroupResponse3.json'));
-		const fetchNestedGroupResponse = fs.readFileSync(path.join(FIXTURES_PATH, 'fetchNestedGroupResponse3.json'));
-		const userData = JSON.parse(fs.readFileSync(path.join(FIXTURES_PATH, 'userData3.json')));
+	it('Should fetch group membership information', (index = '2') => {
+		const createSessionResponse = getFixture([index, 'createSessionResponse.json']);
+		const fetchUserResponse = getFixture([index, 'fetchUserResponse.json']);
+		const userData = getFixture({components: [index, 'userData.json'], reader: READERS.JSON});
+		const fetchDirectGroupResponse = getFixture([index, 'fetchDirectGroupResponse.json']);
+		const fetchNestedGroupResponse = getFixture([index, 'fetchNestedGroupResponse.json']);
 
 		nock('https://crowd')
 			.post('/usermanagement/1/session').reply(201, createSessionResponse)
@@ -127,13 +128,13 @@ describe('index', () => {
 			.get('/usermanagement/1/user/group/direct?username=foobar').reply(200, fetchDirectGroupResponse)
 			.get('/usermanagement/1/user/group/nested?username=foobar').reply(200, fetchNestedGroupResponse);
 
-		const Strategy = new AtlassianCrowdStrategy({
-			url: 'https://crowd', app: 'foo', password: 'bar',
+		const strategy = new Strategy({
+			url: 'https://crowd', appName: 'foo', appPassword: 'bar',
 			ssoCookie: 'foo', fetchGroupMembership: true
 		});
 
 		return new Promise((resolve, reject) => {
-			chai.passport.use(Strategy)
+			chai.passport.use(strategy)
 				.fail(() => reject(new Error('Should not call fail()')))
 				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
 				.success(user => {
@@ -147,6 +148,23 @@ describe('index', () => {
 				.req(req => {
 					req.headers.authorization = `Basic ${Buffer.from('foobar:barfoo').toString('base64')}`;
 				})
+				.authenticate();
+		});
+	});
+
+	it('Should call error() because of an unexpected error', async () => {
+		nock('https://crowd/usermanagement/1/session')
+			.post(/.*/).reply(500);
+
+		const strategy = new Strategy({
+			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
+		});
+
+		return new Promise((resolve, reject) => {
+			chai.passport.use(strategy)
+				.success(() => reject(new Error('Should not call success()')))
+				.fail(() => reject(new Error('Should not call fail()')))
+				.error(resolve)
 				.authenticate();
 		});
 	});

@@ -1,0 +1,17 @@
+{
+    "created-date": 1553588435000,
+    "expiry-date": 1553631364322,
+    "expand": "user",
+    "token": "bar",
+    "user": {
+        "name": "foobar",
+        "link": {
+            "href": "https://crowd/usermanagement/1/user?username=foobar",
+            "rel": "self"
+        }
+    },
+    "link": {
+        "href": "https://crowd/usermanagement/1/session/bar",
+        "rel": "self"
+    }
+}

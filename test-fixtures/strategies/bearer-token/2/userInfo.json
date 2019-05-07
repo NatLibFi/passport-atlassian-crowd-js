@@ -1,0 +1,19 @@
+{
+	"id": "foobar",
+	"displayName": "foobar",
+	"name": {
+		"givenName": "Foo",
+		"familyName": "Bar"
+	},
+	"emails": [
+		{
+			"value": "foo@bar",
+			"type": "work"
+		}
+	],
+	"organization": [],
+	"groups": [
+		"foo",
+		"bar"
+	]
+}
