@@ -35,13 +35,8 @@ export default class extends Strategy {
 
 		try {
 			const token = getToken();
-
-			if (token) {
-				const userInfo = await getUserInfo(token);
-				this.success(userInfo);
-			} else {
-				this.fail();
-			}
+			const userInfo = await getUserInfo(token);
+			this.success(userInfo);
 		} catch (err) {
 			if (err instanceof ApiError) {
 				this.fail();
@@ -95,6 +90,8 @@ export default class extends Strategy {
 			if (req.headers.authorization) {
 				return req.headers.authorization.replace(/^Bearer /, '');
 			}
+
+			throw new ApiError();
 		}
 	}
 }

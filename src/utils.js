@@ -15,6 +15,8 @@
 *
 */
 
+import ApiError from './error';
+
 export function getCredentials(req) {
 	if (req.headers.authorization) {
 		const encoded = req.headers.authorization.replace(/^Basic /, '');
@@ -22,7 +24,7 @@ export function getCredentials(req) {
 		return {username, password};
 	}
 
-	return {};
+	throw new ApiError();
 }
 
 export function getRemoteAddress(req) {

@@ -95,6 +95,9 @@ describe('strategies/bearer-credentials', () => {
 				.success(() => reject(new Error('Should not call success()')))
 				.fail(() => reject(new Error('Should not call fail()')))
 				.error(resolve)
+				.req(req => {
+					req.headers.authorization = `Basic ${Buffer.from('foobar:barfoo').toString('base64')}`;
+				})
 				.authenticate();
 		});
 	});
