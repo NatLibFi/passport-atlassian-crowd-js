@@ -79,6 +79,7 @@ export default class extends Strategy {
 				return token in self._cache;
 
 				function clearExpired() {
+					console.log(self._cache.name);
 					Object.entries(self._cache).forEach(([k, v]) => {
 						console.log('Check if expired');
 						console.log(moment().toString());
