@@ -23,7 +23,7 @@
 		"node": ">=8"
 	},
 	"scripts": {
-		"prepublishOnly": "npm run build",
+		"prepare": "npm run build",
 		"check-deps": "npm-check;exit 0",
 		"lint": "eslint --fix src",
 		"test:base": "cross-env NODE_ENV=test nyc mocha --require @babel/register",
