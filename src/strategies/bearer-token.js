@@ -56,6 +56,8 @@ export default class extends Strategy {
 				});
 
 				const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
+				console.log(sessionInfo['expiry-date']);
+				console.log(moment(sessionInfo['expiry-date']));
 
 				self._cache[token] = {
 					userInfo,
