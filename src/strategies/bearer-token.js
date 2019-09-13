@@ -80,6 +80,9 @@ export default class extends Strategy {
 
 				function clearExpired() {
 					Object.entries(self._cache).forEach(([k, v]) => {
+						console.log('Check if expired');
+						console.log(moment().toString());
+						console.log(v.expirationTime.toString());
 						if (moment().isAfter(v.expirationTime)) {
 							delete self._cache[k];
 						}
