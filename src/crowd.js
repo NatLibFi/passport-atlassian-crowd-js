@@ -72,6 +72,9 @@ export default function ({url, appName, appPassword, fetchGroupMembership}) {
 			})
 		});
 
+		console.log('fetchSessionInfo');
+		console.log(response.status);
+
 		if ([HttpStatus.CREATED, HttpStatus.OK].includes(response.status)) {
 			return response.json();
 		}
@@ -90,6 +93,9 @@ export default function ({url, appName, appPassword, fetchGroupMembership}) {
 				Accept: 'application/json'
 			}
 		});
+
+		console.log('fetchUserInfo');
+		console.log(response.status);
 
 		if (response.status === HttpStatus.OK) {
 			const userInfo = parseUserInfo(await response.json());
