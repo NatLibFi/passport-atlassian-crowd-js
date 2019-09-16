@@ -56,8 +56,8 @@ export default class extends Strategy {
 				});
 
 				const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
-				console.log(sessionInfo['expiry-date']);
-				console.log(moment(sessionInfo['expiry-date']));
+				console.log('TOKEN');
+				console.log(token);
 
 				self._cache[token] = {
 					userInfo,
@@ -80,8 +80,6 @@ export default class extends Strategy {
 
 				function clearExpired() {
 					Object.entries(self._cache).forEach(([k, v]) => {
-						console.log(v.userInfo.id);
-						console.log(v.userInfo.displayName);
 						console.log('Check if expired');
 						console.log(moment().toString());
 						console.log(v.expirationTime.toString());
