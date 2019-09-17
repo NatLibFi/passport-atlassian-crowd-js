@@ -54,9 +54,9 @@ export default class extends Strategy {
 				this.success(userInfo);
 			}
 		} catch (err) {
+			console.log('auhenticate catch');
+			console.log(err);
 			if (err instanceof ApiError) {
-				console.log('auhenticate catch');
-				console.log(err);
 				this.fail();
 			} else {
 				this.error(err);

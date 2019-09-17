@@ -76,13 +76,16 @@ export default function ({url, appName, appPassword, fetchGroupMembership}) {
 		console.log(response.status);
 
 		if ([HttpStatus.CREATED, HttpStatus.OK].includes(response.status)) {
+			console.log('all OK returning response!');
 			return response.json();
 		}
 
 		if (HttpStatus.NOT_FOUND === response.status) {
+			console.log('Throwing api error');
 			throw new ApiError();
 		}
 
+		console.log('Throwing normal error');
 		throw new Error(`${response.status}: ${await response.text()}`);
 	}
 
