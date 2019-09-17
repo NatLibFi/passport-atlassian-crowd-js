@@ -56,8 +56,6 @@ export default class extends Strategy {
 		} catch (err) {
 			if (err instanceof ApiError) {
 				this.fail();
-			} else {
-				this.error(err);
 			}
 		}
 
