@@ -40,7 +40,7 @@ const app = express();
 app.use(passport.initialize());
 
 passport.use(new BasicStrategy({
-    url: CROWD_URL, app: CROWD_APP_NAME, password: CROWD_APP_PASSWORD
+    url: CROWD_URL, appName: CROWD_APP_NAME, appPassword: CROWD_APP_PASSWORD
 }));
 
 app.get('/foo', passport.authenticate('atlassian-crowd-basic', {session: false}));
