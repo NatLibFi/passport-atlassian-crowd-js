@@ -40,7 +40,7 @@ const app = express();
 app.use(passport.initialize());
 
 passport.use(new BasicStrategy({
-    url: CROWD_URL, app: CROWD_APP_NAME, password: CROWD_APP_PASSWORD
+    url: CROWD_URL, appName: CROWD_APP_NAME, appPassword: CROWD_APP_PASSWORD
 }));
 
 app.get('/foo', passport.authenticate('atlassian-crowd-basic', {session: false}));
@@ -48,8 +48,8 @@ app.get('/foo', passport.authenticate('atlassian-crowd-basic', {session: false})
 ### Configuration
 The configuration is passed in to the class constructor in an object which supports the following properties:
 - **url**: Crowd service URL
-- **app** Crowd application name
-- **password**: Crowd application password
+- **appName** Crowd application name
+- **appPassword**: Crowd application password
 - **ssoCookie** *(Optional)*: Name of the SSO cookie. Defaults to **crowd.token_key**.
 - **fetchGroupMembership** *(Optional)*: Boolean indicating whether to retrieve group membership or not. Defaults to **false**.
 ## Bearer strategies
@@ -64,11 +64,11 @@ const app = express();
 app.use(passport.initialize());
 
 passport.use(new BearerCredentialsStrategy({
-    url: CROWD_URL, app: CROWD_APP_NAME, password: CROWD_APP_PASSWORD
+    url: CROWD_URL, appName: CROWD_APP_NAME, appPassword: CROWD_APP_PASSWORD
 }));
 
 passport.use(new BearerTokenStrategy({
-    url: CROWD_URL, app: CROWD_APP_NAME, password: CROWD_APP_PASSWORD
+    url: CROWD_URL, appPassword: CROWD_APP_NAME, appPassword: CROWD_APP_PASSWORD
 }));
 
 app.post('/auth', passport.authenticate('atlassian-crowd-bearer-credentials', {session: false}));
@@ -78,13 +78,13 @@ app.get('/foo', passport.authenticate('atlassian-crowd-bearer-token', {session: 
 The configuration is passed in to the class constructor in an object which supports the following properties:
 #### Credentials
 - **url**: Crowd service URL
-- **app** Crowd application name
-- **password**: Crowd application password
+- **appName** Crowd application name
+- **appPassword**: Crowd application password
 
 #### Token
 - **url**: Crowd service URL
-- **app** Crowd application name
-- **password**: Crowd application password
+- **appName** Crowd application name
+- **appPassword**: Crowd application password
 - **fetchGroupMembership** *(Optional)*: Boolean indicating whether to retrieve group membership or not. Defaults to **false**.
 - **useCache** (*Optional)*: Boolean indicating whether to cache tokens and user information. Cache entries will only be removed when token expires. Defaults to **false**.
 # User data format
