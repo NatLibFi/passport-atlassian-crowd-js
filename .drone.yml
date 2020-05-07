@@ -14,6 +14,7 @@ steps:
       from_secret: npm_token
   when:
     event: tag
-trigger:
-  event: [push, tag]    
-  
+---
+kind: secret
+name: npm_token
+data: 1ZCH4KhogyitFaNgz/Sf5kiMLNaR+IFndVuIeeuPti6POSTMc+a99dm+BQ1ZlrrvKE0cdTkCba39WkhT7f197A==
