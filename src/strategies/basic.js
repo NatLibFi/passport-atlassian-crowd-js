@@ -63,17 +63,17 @@ export default class extends Strategy {
 
 		function getToken() {
 			if (req.headers.cookie) {
-				const cookie = req.headers.cookie
-					.split(/;/)
-					.map(str => {
-						const [name, value] = str.split(/=/); // eslint-disable-line no-div-regex
-						return {name, value};
-					})
-					.find(({name}) => name === self._ssoCookie);
-
-				if (cookie) {
-					return cookie.value;
+				var cookieArr = req.headers.cookie.split(';');
+		
+				for (var i = 0; i < cookieArr.length; i++) {
+					var cookiePair = cookieArr[i].split('=');
+		
+					if (self._ssoCookie === cookiePair[0].trim()) {
+						return cookiePair[1];
+					}
 				}
+		
+				return null;
 			}
 		}
 	}
