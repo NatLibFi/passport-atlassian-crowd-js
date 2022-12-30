@@ -55,7 +55,7 @@
 		"eslint": "^5.9.0",
 		"eslint-config-xo": ">=0.25.1 <1.0.0",
 		"eslint-plugin-import": "^2.16.0",
-		"mocha": "^6.0.2",
+		"mocha": "^10.2.0",
 		"nock": "^10.0.6",
 		"npm-check": "^5.9.0",
 		"nyc": "^13.1.0"
