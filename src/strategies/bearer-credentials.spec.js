@@ -24,81 +24,81 @@ import Strategy from './bearer-credentials';
 chai.use(chaiPassportStrategy);
 
 describe('strategies/bearer-credentials', () => {
-	const {getFixture} = fixturesFactory({
-		root: [__dirname, '..', '..', 'test-fixtures', 'strategies', 'bearer-credentials']
-	});
+  const {getFixture} = fixturesFactory({
+    root: [__dirname, '..', '..', 'test-fixtures', 'strategies', 'bearer-credentials']
+  });
 
-	afterEach(() => {
-		nock.cleanAll();
-	});
+  afterEach(() => {
+    nock.cleanAll();
+  });
 
-	it('Should call fail() because of invalid credentials', async () => {
-		nock('https://crowd/usermanagement/1/session')
-			.post(/.*/).reply(400);
+  it('Should call fail() because of invalid credentials', () => {
+    nock('https://crowd/usermanagement/1/session')
+      .post(/.*/u).reply(400);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar'
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.success(() => reject(new Error('Should not call success()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.fail(resolve)
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .success(() => reject(new Error('Should not call success()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .fail(resolve)
+        .authenticate();
+    });
+  });
 
-	it('Should succeed because of valid credentials', (index = '1') => {
-		const createSessionResponse = getFixture([index, 'createSessionResponse.json']);
-		const fetchUserResponse = getFixture([index, 'fetchUserResponse.json']);
-		const token = getFixture([index, 'token.txt']);
+  it('Should succeed because of valid credentials', (index = '1') => {
+    const createSessionResponse = getFixture({components: [index, 'createSessionResponse.json']});
+    const fetchUserResponse = getFixture({components: [index, 'fetchUserResponse.json']});
+    const token = getFixture({components: [index, 'token.txt']});
 
-		nock('https://crowd')
-			.post('/usermanagement/1/session').reply(201, createSessionResponse)
-			.get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
+    nock('https://crowd')
+      .post('/usermanagement/1/session').reply(201, createSessionResponse)
+      .get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar',
-			ssoCookie: 'foo'
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar',
+      ssoCookie: 'foo'
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.fail(() => reject(new Error('Should not call fail()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.success(user => {
-					try {
-						expect(user).to.equal(token);
-						resolve();
-					} catch (err) {
-						reject(err);
-					}
-				})
-				.req(req => {
-					req.headers.authorization = `Basic ${Buffer.from('foobar:barfoo').toString('base64')}`;
-				})
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .fail(() => reject(new Error('Should not call fail()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .success(user => {
+          try {
+            expect(user).to.equal(token);
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        })
+        .request(req => {
+          req.headers.authorization = `Basic ${Buffer.from('foobar:barfoo').toString('base64')}`; // eslint-disable-line functional/immutable-data
+        })
+        .authenticate();
+    });
+  });
 
-	it('Should call error() because of unexpected error', async () => {
-		nock('https://crowd/usermanagement/1/session')
-			.post(/.*/).reply(500);
+  it('Should call error() because of unexpected error', () => {
+    nock('https://crowd/usermanagement/1/session')
+      .post(/.*/u).reply(500);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar'
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.success(() => reject(new Error('Should not call success()')))
-				.fail(() => reject(new Error('Should not call fail()')))
-				.error(resolve)
-				.req(req => {
-					req.headers.authorization = `Basic ${Buffer.from('foobar:barfoo').toString('base64')}`;
-				})
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .success(() => reject(new Error('Should not call success()')))
+        .fail(() => reject(new Error('Should not call fail()')))
+        .error(resolve)
+        .request(req => {
+          req.headers.authorization = `Basic ${Buffer.from('foobar:barfoo').toString('base64')}`; // eslint-disable-line functional/immutable-data
+        })
+        .authenticate();
+    });
+  });
 });

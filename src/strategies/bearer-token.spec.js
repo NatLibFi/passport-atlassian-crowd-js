@@ -15,202 +15,204 @@
 *
 */
 
+/* eslint-disable functional/immutable-data */
+
 import chai, {expect} from 'chai';
 import chaiPassportStrategy from 'chai-passport-strategy';
 import nock from 'nock';
 import fixturesFactory, {READERS} from '@natlibfi/fixura';
-import Strategy, {__RewireAPI__ as RewireAPI} from './bearer-token'; // eslint-disable-line import/named
+import Strategy, {__RewireAPI__ as RewireAPI} from './bearer-token';
 
 chai.use(chaiPassportStrategy);
 
 describe('strategies/bearer-token', () => {
-	const {getFixture} = fixturesFactory({
-		root: [__dirname, '..', '..', 'test-fixtures', 'strategies', 'bearer-token']
-	});
+  const {getFixture} = fixturesFactory({
+    root: [__dirname, '..', '..', 'test-fixtures', 'strategies', 'bearer-token']
+  });
 
-	afterEach(() => {
-		nock.cleanAll();
-		RewireAPI.__ResetDependency__('moment');
-	});
+  afterEach(() => {
+    nock.cleanAll();
+    RewireAPI.__ResetDependency__('moment');
+  });
 
-	it('Should call fail() because of invalid token', async () => {
-		nock('https://crowd/usermanagement/1/session/foo')
-			.post(/.*/).reply(404);
+  it('Should call fail() because of invalid token', () => {
+    nock('https://crowd/usermanagement/1/session/foo')
+      .post(/.*/u).reply(404);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar'
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.success(() => reject(new Error('Should not call success()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.fail(resolve)
-				.req(req => {
-					req.headers.authorization = 'Bearer foo';
-				})
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .success(() => reject(new Error('Should not call success()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .fail(resolve)
+        .request(req => {
+          req.headers.authorization = 'Bearer foo';
+        })
+        .authenticate();
+    });
+  });
 
-	it('Should succeed because of valid token', (index = '1') => {
-		const fetchSessionResponse = getFixture([index, 'fetchSessionResponse.json']);
-		const fetchUserResponse = getFixture([index, 'fetchUserResponse.json']);
-		const userInfo = getFixture({components: [index, 'userInfo.json'], reader: READERS.JSON});
+  it('Should succeed because of valid token', (index = '1') => {
+    const fetchSessionResponse = getFixture({components: [index, 'fetchSessionResponse.json']});
+    const fetchUserResponse = getFixture({components: [index, 'fetchUserResponse.json']});
+    const userInfo = getFixture({components: [index, 'userInfo.json'], reader: READERS.JSON});
 
-		nock('https://crowd')
-			.post('/usermanagement/1/session/foo').reply(201, fetchSessionResponse)
-			.get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
+    nock('https://crowd')
+      .post('/usermanagement/1/session/foo').reply(201, fetchSessionResponse)
+      .get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar'
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.fail(() => reject(new Error('Should not call fail()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.success(user => {
-					try {
-						expect(user).to.eql(userInfo);
-						resolve();
-					} catch (err) {
-						reject(err);
-					}
-				})
-				.req(req => {
-					req.headers.authorization = 'Bearer foo';
-				})
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .fail(() => reject(new Error('Should not call fail()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .success(user => {
+          try {
+            expect(user).to.eql(userInfo);
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        })
+        .request(req => {
+          req.headers.authorization = 'Bearer foo';
+        })
+        .authenticate();
+    });
+  });
 
-	it('Should succeed because of valid token (Retrieve groups)', (index = '2') => {
-		const fetchSessionResponse = getFixture([index, 'fetchSessionResponse.json']);
-		const fetchUserResponse = getFixture([index, 'fetchUserResponse.json']);
-		const fetchDirectGroupsResponse = getFixture([index, 'fetchDirectGroupsResponse.json']);
-		const fetchNestedGroupsResponse = getFixture([index, 'fetchNestedGroupsResponse.json']);
-		const userInfo = getFixture({components: [index, 'userInfo.json'], reader: READERS.JSON});
+  it('Should succeed because of valid token (Retrieve groups)', (index = '2') => {
+    const fetchSessionResponse = getFixture({components: [index, 'fetchSessionResponse.json']});
+    const fetchUserResponse = getFixture({components: [index, 'fetchUserResponse.json']});
+    const fetchDirectGroupsResponse = getFixture({components: [index, 'fetchDirectGroupsResponse.json']});
+    const fetchNestedGroupsResponse = getFixture({components: [index, 'fetchNestedGroupsResponse.json']});
+    const userInfo = getFixture({components: [index, 'userInfo.json'], reader: READERS.JSON});
 
-		nock('https://crowd')
-			.post('/usermanagement/1/session/foo').reply(201, fetchSessionResponse)
-			.get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse)
-			.get('/usermanagement/1/user/group/direct?username=foobar').reply(200, fetchDirectGroupsResponse)
-			.get('/usermanagement/1/user/group/nested?username=foobar').reply(200, fetchNestedGroupsResponse);
+    nock('https://crowd')
+      .post('/usermanagement/1/session/foo').reply(201, fetchSessionResponse)
+      .get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse)
+      .get('/usermanagement/1/user/group/direct?username=foobar').reply(200, fetchDirectGroupsResponse)
+      .get('/usermanagement/1/user/group/nested?username=foobar').reply(200, fetchNestedGroupsResponse);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar', fetchGroupMembership: true
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar', fetchGroupMembership: true
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.fail(() => reject(new Error('Should not call fail()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.success(user => {
-					try {
-						expect(user).to.eql(userInfo);
-						resolve();
-					} catch (err) {
-						reject(err);
-					}
-				})
-				.req(req => {
-					req.headers.authorization = 'Bearer foo';
-				})
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .fail(() => reject(new Error('Should not call fail()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .success(user => {
+          try {
+            expect(user).to.eql(userInfo);
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        })
+        .request(req => {
+          req.headers.authorization = 'Bearer foo';
+        })
+        .authenticate();
+    });
+  });
 
-	it('Should succeed because of valid token', async (index = '3') => {
-		RewireAPI.__Rewire__('moment', () => ({
-			isAfter: () => false
-		}));
+  it('Should succeed because of valid token', async (index = '3') => {
+    RewireAPI.__Rewire__('moment', () => ({
+      isAfter: () => false
+    }));
 
-		const fetchSessionResponse = getFixture([index, 'fetchSessionResponse.json']);
-		const fetchUserResponse = getFixture([index, 'fetchUserResponse.json']);
-		const userInfo = getFixture({components: [index, 'userInfo.json'], reader: READERS.JSON});
+    const fetchSessionResponse = getFixture({components: [index, 'fetchSessionResponse.json']});
+    const fetchUserResponse = getFixture({components: [index, 'fetchUserResponse.json']});
+    const userInfo = getFixture({components: [index, 'userInfo.json'], reader: READERS.JSON});
 
-		nock('https://crowd')
-			.post('/usermanagement/1/session/foo').reply(201, fetchSessionResponse)
-			.get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
+    nock('https://crowd')
+      .post('/usermanagement/1/session/foo').reply(201, fetchSessionResponse)
+      .get('/usermanagement/1/user?username=foobar').reply(200, fetchUserResponse);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar', useCache: true
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar', useCache: true
+    });
 
-		const passportHelper = chai.passport.use(strategy);
+    const passportHelper = chai.passport.use(strategy);
 
-		await new Promise((resolve, reject) => {
-			passportHelper
-				.fail(() => reject(new Error('Should not call fail()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.success(user => {
-					try {
-						expect(user).to.eql(userInfo);
-						resolve();
-					} catch (err) {
-						reject(err);
-					}
-				})
-				.req(req => {
-					req.headers.authorization = 'Bearer foo';
-				})
-				.authenticate();
-		});
+    await new Promise((resolve, reject) => {
+      passportHelper
+        .fail(() => reject(new Error('Should not call fail()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .success(user => {
+          try {
+            expect(user).to.eql(userInfo);
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        })
+        .request(req => {
+          req.headers.authorization = 'Bearer foo';
+        })
+        .authenticate();
+    });
 
-		await new Promise((resolve, reject) => {
-			passportHelper
-				.fail(() => reject(new Error('Should not call fail()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.success(user => {
-					try {
-						expect(user).to.eql(userInfo);
-						resolve();
-					} catch (err) {
-						reject(err);
-					}
-				})
-				.req(req => {
-					req.headers.authorization = 'Bearer foo';
-				})
-				.authenticate();
-		});
-	});
+    await new Promise((resolve, reject) => {
+      passportHelper
+        .fail(() => reject(new Error('Should not call fail()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .success(user => {
+          try {
+            expect(user).to.eql(userInfo);
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        })
+        .request(req => {
+          req.headers.authorization = 'Bearer foo';
+        })
+        .authenticate();
+    });
+  });
 
-	it('Should call fail() because of missing token', async () => {
-		nock('https://crowd/usermanagement/1/session')
-			.post(/.*/).reply(401);
+  it('Should call fail() because of missing token', () => {
+    nock('https://crowd/usermanagement/1/session')
+      .post(/.*/u).reply(401);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar'
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.success(() => reject(new Error('Should not call success()')))
-				.error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
-				.fail(resolve)
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .success(() => reject(new Error('Should not call success()')))
+        .error(err => reject(new Error(`Should not call error(): ${err.stack}`)))
+        .fail(resolve)
+        .authenticate();
+    });
+  });
 
-	it('Should call error() because on a unexpected error', async () => {
-		nock('https://crowd/usermanagement/1/session/foo')
-			.post(/.*/).reply(500);
+  it('Should call error() because on a unexpected error', () => {
+    nock('https://crowd/usermanagement/1/session/foo')
+      .post(/.*/u).reply(500);
 
-		const strategy = new Strategy({
-			url: 'https://crowd', appName: 'foo', appPassword: 'bar'
-		});
+    const strategy = new Strategy({
+      url: 'https://crowd', appName: 'foo', appPassword: 'bar'
+    });
 
-		return new Promise((resolve, reject) => {
-			chai.passport.use(strategy)
-				.success(() => reject(new Error('Should not call success()')))
-				.fail(() => reject(new Error('Should not call fail()')))
-				.error(resolve)
-				.req(req => {
-					req.headers.authorization = 'Bearer foo';
-				})
-				.authenticate();
-		});
-	});
+    return new Promise((resolve, reject) => {
+      chai.passport.use(strategy)
+        .success(() => reject(new Error('Should not call success()')))
+        .fail(() => reject(new Error('Should not call fail()')))
+        .error(resolve)
+        .request(req => {
+          req.headers.authorization = 'Bearer foo';
+        })
+        .authenticate();
+    });
+  });
 });

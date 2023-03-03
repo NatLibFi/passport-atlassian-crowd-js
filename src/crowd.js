@@ -20,129 +20,129 @@ import HttpStatus from 'http-status';
 import ApiError from './error';
 
 export default function ({url, appName, appPassword, fetchGroupMembership}) {
-	const authorizationHeader = `Basic ${Buffer.from(`${appName}:${appPassword}`).toString('base64')}`;
+  const authorizationHeader = `Basic ${Buffer.from(`${appName}:${appPassword}`).toString('base64')}`;
 
-	return {validateCredentials, fetchSessionInfo, fetchUserInfo};
+  return {validateCredentials, fetchSessionInfo, fetchUserInfo};
 
-	async function validateCredentials({username, password, remoteAddress}) {
-		const response = await fetch(`${url}/usermanagement/1/session`, {
-			method: 'POST',
-			headers: {
-				Authorization: authorizationHeader,
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				username, password,
-				'validation-factors': {
-					validationFactors: [{
-						name: 'remote_address',
-						value: remoteAddress || '127.0.0.1'
-					}]
-				}
-			})
-		});
+  async function validateCredentials({username, password, remoteAddress}) {
+    const response = await fetch(`${url}/usermanagement/1/session`, {
+      method: 'POST',
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username, password,
+        'validation-factors': {
+          validationFactors: [
+            {
+              name: 'remote_address',
+              value: remoteAddress || '127.0.0.1'
+            }
+          ]
+        }
+      })
+    });
 
-		if (response.status === HttpStatus.CREATED) {
-			return response.json();
-		}
+    if (response.status === HttpStatus.CREATED) {
+      return response.json();
+    }
 
-		if (HttpStatus.BAD_REQUEST === response.status) {
-			throw new ApiError();
-		}
+    if (HttpStatus.BAD_REQUEST === response.status) {
+      throw new ApiError();
+    }
 
-		throw new Error(`${response.status}: ${await response.text()}`);
-	}
+    throw new Error(`${response.status}: ${await response.text()}`);
+  }
 
-	async function fetchSessionInfo({token, remoteAddress}) {
-		const response = await fetch(`${url}/usermanagement/1/session/${token}`, {
-			method: 'POST',
-			headers: {
-				Authorization: authorizationHeader,
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				validationFactors: [
-					{
-						name: 'remote_address',
-						value: remoteAddress || '127.0.0.1'
-					}
-				]
-			})
-		});
+  async function fetchSessionInfo({token, remoteAddress}) {
+    const response = await fetch(`${url}/usermanagement/1/session/${token}`, {
+      method: 'POST',
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        validationFactors: [
+          {
+            name: 'remote_address',
+            value: remoteAddress || '127.0.0.1'
+          }
+        ]
+      })
+    });
 
-		if ([HttpStatus.CREATED, HttpStatus.OK].includes(response.status)) {
-			return response.json();
-		}
+    if ([HttpStatus.CREATED, HttpStatus.OK].includes(response.status)) {
+      return response.json();
+    }
 
-		if (HttpStatus.NOT_FOUND === response.status) {
-			throw new ApiError();
-		}
+    if (HttpStatus.NOT_FOUND === response.status) {
+      throw new ApiError();
+    }
 
-		throw new Error(`${response.status}: ${await response.text()}`);
-	}
+    throw new Error(`${response.status}: ${await response.text()}`);
+  }
 
-	async function fetchUserInfo(username) {
-		const response = await fetch(`${url}/usermanagement/1/user?username=${username}`, {
-			headers: {
-				Authorization: authorizationHeader,
-				Accept: 'application/json'
-			}
-		});
+  async function fetchUserInfo(username) {
+    const response = await fetch(`${url}/usermanagement/1/user?username=${username}`, {
+      headers: {
+        Authorization: authorizationHeader,
+        Accept: 'application/json'
+      }
+    });
 
-		if (response.status === HttpStatus.OK) {
-			const userInfo = parseUserInfo(await response.json());
+    if (response.status === HttpStatus.OK) {
+      const userInfo = parseUserInfo(await response.json());
 
-			if (fetchGroupMembership) {
-				return {
-					...userInfo,
-					groups: await fetchGroups()
-				};
-			}
+      if (fetchGroupMembership) {
+        return {
+          ...userInfo,
+          groups: await fetchGroups()
+        };
+      }
 
-			return userInfo;
-		}
+      return userInfo;
+    }
 
-		throw new Error(`${response.status}: ${await response.text()}`);
+    throw new Error(`${response.status}: ${await response.text()}`);
 
-		/* Returns contact schema compliant profile: https://tools.ietf.org/html/draft-smarr-vcarddav-portable-contacts-00 */
-		function parseUserInfo(payload) {
-			return {
-				id: payload.name,
-				name: {
-					givenName: payload['first-name'],
-					familyName: payload['last-name']
-				},
-				displayName: payload['display-name'],
-				emails: [{value: payload.email, type: 'work'}],
-				organization: []
-			};
-		}
+    /* Returns contact schema compliant profile: https://tools.ietf.org/html/draft-smarr-vcarddav-portable-contacts-00 */
+    function parseUserInfo(payload) {
+      return {
+        id: payload.name,
+        name: {
+          givenName: payload['first-name'],
+          familyName: payload['last-name']
+        },
+        displayName: payload['display-name'],
+        emails: [{value: payload.email, type: 'work'}],
+        organization: []
+      };
+    }
 
-		async function fetchGroups() {
-			const directGroups = await getGroups('direct');
-			const nestedGroups = await getGroups('nested');
+    async function fetchGroups() {
+      const directGroups = await getGroups('direct');
+      const nestedGroups = await getGroups('nested');
 
-			return directGroups.concat(nestedGroups).reduce((acc, group) => {
-				return acc.includes(group) ? acc : acc.concat(group);
-			}, []);
+      return directGroups.concat(nestedGroups).reduce((acc, group) => acc.includes(group) ? acc : acc.concat(group), []);
 
-			async function getGroups(context) {
-				const response = await fetch(`${url}/usermanagement/1/user/group/${context}?username=${username}`, {
-					headers: {
-						Authorization: authorizationHeader,
-						Accept: 'application/json'
-					}
-				});
+      async function getGroups(context) {
+        const response = await fetch(`${url}/usermanagement/1/user/group/${context}?username=${username}`, {
+          headers: {
+            Authorization: authorizationHeader,
+            Accept: 'application/json'
+          }
+        });
 
-				if (response.status === HttpStatus.OK) {
-					const payload = await response.json();
-					return payload.groups.map(g => g.name);
-				}
+        if (response.status === HttpStatus.OK) {
+          const payload = await response.json();
+          return payload.groups.map(g => g.name);
+        }
 
-				throw new Error(`${response.status}: ${await response.text()}`);
-			}
-		}
-	}
+        throw new Error(`${response.status}: ${await response.text()}`);
+      }
+    }
+  }
 }

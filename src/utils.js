@@ -18,16 +18,16 @@
 import ApiError from './error';
 
 export function getCredentials(req) {
-	if (req.headers.authorization) {
-		const encoded = req.headers.authorization.replace(/^Basic /, '');
-		const [username, password] = Buffer.from(encoded, 'base64').toString().split(/:(.*)/);
-		return {username, password};
-	}
+  if (req.headers.authorization) {
+    const encoded = req.headers.authorization.replace(/^Basic /u, '');
+    const [username, password] = Buffer.from(encoded, 'base64').toString().split(/:(.*)/u); // eslint-disable-line prefer-named-capture-group
+    return {username, password};
+  }
 
-	throw new ApiError();
+  throw new ApiError();
 }
 
 export function getRemoteAddress(req) {
-	/* istanbul ignore next: chai-passport request doesn't provide socket */
-	return req.socket ? req.socket.remoteAddress : undefined;
+  /* istanbul ignore next: chai-passport request doesn't provide socket */
+  return req.socket ? req.socket.remoteAddress : undefined;
 }
