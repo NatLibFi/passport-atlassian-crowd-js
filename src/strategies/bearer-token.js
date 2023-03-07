@@ -15,6 +15,8 @@
 *
 */
 
+/* eslint-disable functional/no-this-expression,functional/no-conditional-statement */
+
 import moment from 'moment';
 import Strategy from 'passport-strategy';
 import ApiError from '../error';
@@ -22,76 +24,76 @@ import crowdFactory from '../crowd';
 import {getRemoteAddress} from '../utils';
 
 export default class extends Strategy {
-	constructor({url, appName, appPassword, fetchGroupMembership, useCache = false}) {
-		super();
-		this.name = 'atlassian-crowd-bearer-token';
-		this._crowdClient = crowdFactory({url, appName, appPassword, fetchGroupMembership});
-		this._useCache = useCache;
-		this._cache = {};
-	}
+  constructor({url, appName, appPassword, fetchGroupMembership, useCache = false}) {
+    super();
+    this.name = 'atlassian-crowd-bearer-token';
+    this._crowdClient = crowdFactory({url, appName, appPassword, fetchGroupMembership});
+    this._useCache = useCache;
+    this._cache = {};
+  }
 
-	async authenticate(req) {
-		const self = this;
+  async authenticate(req) {
+    const self = this; // eslint-disable-line consistent-this
 
-		try {
-			const token = getToken();
-			const userInfo = await getUserInfo(token);
-			this.success(userInfo);
-		} catch (err) {
-			if (err instanceof ApiError) {
-				this.fail();
-			} else {
-				this.error(err);
-			}
-		}
+    try {
+      const token = getToken();
+      const userInfo = await getUserInfo(token);
+      this.success(userInfo);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        this.fail();
+      } else {
+        this.error(err);
+      }
+    }
 
-		async function getUserInfo(token) {
-			if (self._useCache) {
-				if (isValid()) {
-					return self._cache[token].userInfo;
-				}
+    async function getUserInfo(token) {
+      if (self._useCache) {
+        if (isValid()) {
+          return self._cache[token].userInfo;
+        }
 
-				const sessionInfo = await self._crowdClient.fetchSessionInfo({
-					token, remoteAddress: getRemoteAddress(req)
-				});
+        const sessionInfo = await self._crowdClient.fetchSessionInfo({
+          token, remoteAddress: getRemoteAddress(req)
+        });
 
-				const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
+        const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
 
-				self._cache[token] = {
-					userInfo,
-					expirationTime: moment(sessionInfo['expiry-date'])
-				};
+        self._cache[token] = { // eslint-disable-line functional/immutable-data,require-atomic-updates
+          userInfo,
+          expirationTime: moment(sessionInfo['expiry-date'])
+        };
 
-				return self._cache[token].userInfo;
-			}
+        return self._cache[token].userInfo;
+      }
 
-			const sessionInfo = await self._crowdClient.fetchSessionInfo({
-				token, remoteAddress: getRemoteAddress(req)
-			});
+      const sessionInfo = await self._crowdClient.fetchSessionInfo({
+        token, remoteAddress: getRemoteAddress(req)
+      });
 
-			const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
-			return userInfo;
+      const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
+      return userInfo;
 
-			function isValid() {
-				clearExpired();
-				return token in self._cache;
+      function isValid() {
+        clearExpired();
+        return token in self._cache;
 
-				function clearExpired() {
-					Object.entries(self._cache).forEach(([k, v]) => {
-						if (moment().isAfter(v.expirationTime)) {
-							delete self._cache[k];
-						}
-					});
-				}
-			}
-		}
+        function clearExpired() {
+          Object.entries(self._cache).forEach(([k, v]) => {
+            if (moment().isAfter(v.expirationTime)) {
+              delete self._cache[k]; // eslint-disable-line functional/immutable-data
+            }
+          });
+        }
+      }
+    }
 
-		function getToken() {
-			if (req.headers.authorization) {
-				return req.headers.authorization.replace(/^Bearer /, '');
-			}
+    function getToken() {
+      if (req.headers.authorization) {
+        return req.headers.authorization.replace(/^Bearer /u, '');
+      }
 
-			throw new ApiError();
-		}
-	}
+      throw new ApiError();
+    }
+  }
 }

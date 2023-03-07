@@ -14,6 +14,7 @@
 * for the JavaScript code in this file.
 *
 */
+/* eslint-disable functional/no-this-expression,functional/no-conditional-statement */
 
 import Strategy from 'passport-strategy';
 import {getCredentials, getRemoteAddress} from '../utils';
@@ -21,29 +22,29 @@ import ApiError from '../error';
 import crowdFactory from '../crowd';
 
 export default class extends Strategy {
-	constructor({url, appName, appPassword}) {
-		super();
+  constructor({url, appName, appPassword}) {
+    super();
 
-		this.name = 'atlassian-crowd-bearer-credentials';
-		this._crowdClient = crowdFactory({url, appName, appPassword});
-	}
+    this.name = 'atlassian-crowd-bearer-credentials';
+    this._crowdClient = crowdFactory({url, appName, appPassword});
+  }
 
-	async authenticate(req) {
-		const self = this;
+  async authenticate(req) {
+    const self = this; // eslint-disable-line consistent-this
 
-		try {
-			const {username, password} = getCredentials(req);
-			const {token} = await self._crowdClient.validateCredentials({
-				username, password, remoteAddress: getRemoteAddress(req)
-			});
+    try {
+      const {username, password} = getCredentials(req);
+      const {token} = await self._crowdClient.validateCredentials({
+        username, password, remoteAddress: getRemoteAddress(req)
+      });
 
-			this.success(token);
-		} catch (err) {
-			if (err instanceof ApiError) {
-				this.fail();
-			} else {
-				this.error(err);
-			}
-		}
-	}
+      this.success(token);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        this.fail();
+      } else {
+        this.error(err);
+      }
+    }
+  }
 }

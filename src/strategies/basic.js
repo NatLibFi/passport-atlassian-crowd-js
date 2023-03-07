@@ -15,66 +15,68 @@
 *
 */
 
+/* eslint-disable  functional/no-this-expression,functional/no-conditional-statement */
+
 import Strategy from 'passport-strategy';
 import ApiError from '../error';
 import crowdFactory from '../crowd';
 import {getCredentials, getRemoteAddress} from '../utils';
 
 export default class extends Strategy {
-	constructor({url, appName, appPassword, fetchGroupMembership, ssoCookie = 'crowd.token_key'}) {
-		super();
+  constructor({url, appName, appPassword, fetchGroupMembership, ssoCookie = 'crowd.token_key'}) {
+    super();
 
-		this.name = 'atlassian-crowd-basic';
-		this._crowdClient = crowdFactory({url, appName, appPassword, fetchGroupMembership});
-		this._ssoCookie = ssoCookie;
-	}
+    this.name = 'atlassian-crowd-basic';
+    this._crowdClient = crowdFactory({url, appName, appPassword, fetchGroupMembership});
+    this._ssoCookie = ssoCookie;
+  }
 
-	async authenticate(req) {
-		const self = this;
+  async authenticate(req) {
+    const self = this; // eslint-disable-line consistent-this
 
-		try {
-			const token = getToken();
+    try {
+      const token = getToken();
 
-			if (token) {
-				const sessionInfo = await self._crowdClient.fetchSessionInfo({
-					token, remoteAddress: getRemoteAddress(req)
-				});
+      if (token) {
+        const sessionInfo = await self._crowdClient.fetchSessionInfo({
+          token, remoteAddress: getRemoteAddress(req)
+        });
 
-				const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
+        const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
 
-				this.success(userInfo);
-			} else {
-				const {username, password} = getCredentials(req);
-				const sessionInfo = await self._crowdClient.validateCredentials({
-					username, password, remoteAddress: getRemoteAddress(req)
-				});
+        this.success(userInfo);
+      } else {
+        const {username, password} = getCredentials(req);
+        const sessionInfo = await self._crowdClient.validateCredentials({
+          username, password, remoteAddress: getRemoteAddress(req)
+        });
 
-				const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
+        const userInfo = await self._crowdClient.fetchUserInfo(sessionInfo.user.name);
 
-				this.success(userInfo);
-			}
-		} catch (err) {
-			if (err instanceof ApiError) {
-				this.fail();
-			} else {
-				this.error(err);
-			}
-		}
+        this.success(userInfo);
+      }
+    } catch (err) {
+      if (err instanceof ApiError) {
+        this.fail();
+      } else {
+        this.error(err);
+      }
+    }
 
-		function getToken() {
-			if (req.headers.cookie) {
-				const cookie = req.headers.cookie
-					.split(/;/)
-					.map(str => {
-						const [name, value] = str.split(/=/); // eslint-disable-line no-div-regex
-						return {name, value};
-					})
-					.find(({name}) => name === self._ssoCookie);
+    function getToken() {
+      if (req.headers.cookie) {
+        const cookie = req.headers.cookie
+          .split(/;/u)
+          .map(str => {
+            const [name, value] = str.split(/=/u); // eslint-disable-line no-div-regex
+            return {name, value};
+          })
+          .find(({name}) => name === self._ssoCookie);
 
-				if (cookie) {
-					return cookie.value;
-				}
-			}
-		}
-	}
+        if (cookie) {
+          return cookie.value;
+        }
+      }
+    }
+  }
 }
