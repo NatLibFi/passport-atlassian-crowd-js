@@ -14,7 +14,7 @@
 		"url": "git@github.com:natlibfi/passport-atlassian-crowd-js.git"
 	},
 	"license": "MIT",
-	"version": "2.0.4",
+	"version": "3.0.0-alpha.1",
 	"main": "./dist/index.js",
 	"publishConfig": {
 		"access": "public"
