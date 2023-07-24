@@ -33,28 +33,28 @@
 		"watch": "cross-env NODE_ENV=test chokidar src -c 'npm test'"
 	},
 	"dependencies": {
-		"@babel/register": "^7.0.0",
+		"@babel/register": "^7.22.5",
 		"http-status": "^1.6.2",
 		"moment": "^2.29.4",
-		"node-fetch": "^2.6.7",
+		"node-fetch": "^2.6.12",
 		"passport-strategy": "^1.0.0"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7.21.0",
-		"@babel/core": "^7.21.0",
-		"@babel/eslint-parser": "^7.19.1",
-		"@babel/preset-env": "^7.20.2",
+		"@babel/cli": "^7.22.9",
+		"@babel/core": "^7.22.9",
+		"@babel/eslint-parser": "^7.22.9",
+		"@babel/preset-env": "^7.22.9",
 		"@natlibfi/eslint-config-melinda-backend": "^2.0.2",
-		"@natlibfi/fixura": "^2.2.5",
+		"@natlibfi/fixura": "^3.0.0",
 		"babel-plugin-rewire": "^1.2.0",
-		"babel-plugin-istanbul": "^6.1.0",
+		"babel-plugin-istanbul": "^6.1.1",
 		"chai": "^4.3.7",
 		"chai-passport-strategy": "^3.0.0",
 		"chokidar-cli": "^3.0.0",
 		"cross-env": "^7.0.3",
-		"eslint": "^8.35.0",
+		"eslint": "^8.45.0",
 		"mocha": "^10.2.0",
-		"nock": "^13.3.0",
+		"nock": "^13.3.2",
 		"nyc": "^15.1.0"
 	},
 	"eslintConfig": {
