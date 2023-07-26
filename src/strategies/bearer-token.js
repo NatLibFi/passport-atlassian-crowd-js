@@ -15,7 +15,7 @@
 *
 */
 
-/* eslint-disable functional/no-this-expression,functional/no-conditional-statement */
+/* eslint-disable functional/no-this-expressions,functional/no-conditional-statements */
 
 import moment from 'moment';
 import Strategy from 'passport-strategy';

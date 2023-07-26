@@ -15,7 +15,7 @@
 *
 */
 
-/* eslint-disable  functional/no-this-expression,functional/no-conditional-statement */
+/* eslint-disable  functional/no-this-expressions,functional/no-conditional-statements */
 
 import Strategy from 'passport-strategy';
 import ApiError from '../error';

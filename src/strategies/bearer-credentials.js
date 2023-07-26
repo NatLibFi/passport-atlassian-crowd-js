@@ -14,7 +14,7 @@
 * for the JavaScript code in this file.
 *
 */
-/* eslint-disable functional/no-this-expression,functional/no-conditional-statement */
+/* eslint-disable functional/no-this-expressions,functional/no-conditional-statements */
 
 import Strategy from 'passport-strategy';
 import {getCredentials, getRemoteAddress} from '../utils';
