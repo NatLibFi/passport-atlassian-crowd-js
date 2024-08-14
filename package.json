@@ -14,7 +14,7 @@
 		"url": "git@github.com:natlibfi/passport-atlassian-crowd-js.git"
 	},
 	"license": "MIT",
-	"version": "3.0.1",
+	"version": "3.0.2-alpha.1",
 	"main": "./dist/index.js",
 	"publishConfig": {
 		"access": "public"
@@ -33,28 +33,28 @@
 		"watch": "cross-env NODE_ENV=test chokidar src -c 'npm test'"
 	},
 	"dependencies": {
-		"@babel/register": "^7.22.15",
-		"http-status": "^1.7.0",
-		"moment": "^2.29.4",
+		"@babel/register": "^7.24.6",
+		"http-status": "^1.7.4",
+		"moment": "^2.30.1",
 		"node-fetch": "^2.7.0",
 		"passport-strategy": "^1.0.0"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7.22.15",
-		"@babel/core": "^7.22.20",
-		"@babel/preset-env": "^7.22.20",
-		"@natlibfi/eslint-config-melinda-backend": "^3.0.2",
-		"@natlibfi/fixura": "^3.0.1",
-		"babel-plugin-istanbul": "^6.1.1",
+		"@babel/cli": "^7.24.8",
+		"@babel/core": "^7.25.2",
+		"@babel/preset-env": "^7.25.3",
+		"@natlibfi/eslint-config-melinda-backend": "^3.0.5",
+		"@natlibfi/fixura": "^3.0.8",
+		"babel-plugin-istanbul": "^7.0.0",
 		"babel-plugin-rewire": "^1.2.0",
-		"chai": "^4.3.8",
+		"chai": "^4.5.0",
 		"chai-passport-strategy": "^3.0.0",
 		"chokidar-cli": "^3.0.0",
 		"cross-env": "^7.0.3",
-		"eslint": "^8.49.0",
-		"mocha": "^10.2.0",
-		"nock": "^13.3.3",
-		"nyc": "^15.1.0"
+		"eslint": "^8.57.0",
+		"mocha": "^10.7.3",
+		"nock": "^13.5.4",
+		"nyc": "^17.0.0"
 	},
 	"eslintConfig": {
 		"extends": "@natlibfi/melinda-backend"
